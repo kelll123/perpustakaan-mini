@@ -2,49 +2,83 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\StaffController;
-// PERBAIKAN 1: Pastikan pakai Staff\BookController (bukan Admin)
-use App\Http\Controllers\Staff\BookController;
-use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
-use App\Http\Controllers\Admin\BookController as AdminBookController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\GuestController;
+use App\Http\Controllers\MemberController;
+use App\Http\Controllers\BorrowController;
+use App\Http\Controllers\RegisterController;
 
-Route::get('/', function () {
-    return view('welcome');
+//Admin
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\BookController as AdminBookController;
+use App\Http\Controllers\Admin\AuthorController as AdminAuthorController;
+use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Admin\StaffController as AdminStaffController;
+
+//Staff 
+use App\Http\Controllers\StaffController as StaffAreaController;
+use App\Http\Controllers\Staff\BookController as StaffBookController;
+
+
+
+// 1. HALAMAN DEPAN (GUEST)
+Route::get('/', [GuestController::class, 'index'])->name('welcome');
+
+Route::get('/book/{id}', [GuestController::class, 'show'])->name('book.detail');
+
+// 2. AUTHENTICATION (Login, Logout, Register)
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
+    
+    Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+    Route::post('/register', [RegisterController::class, 'register']);
 });
 
-// Route Auth
-Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
-// Dashboard Admin
-Route::get('/admin/dashboard', function () {
-    return view('admin.dashboard');
-})->middleware('auth');
 
-// Group Staff
-Route::middleware(['auth', 'role:staff'])->group(function () {
+// 3. MEMBER AREA (Peminjam)
+Route::middleware(['auth'])->group(function () {
+    // Dashboard Member
+    Route::get('/home', [HomeController::class, 'index'])->name('home');
+    
+    // Proses Pinjam Buku
+    Route::post('/borrow/{id}', [BorrowController::class, 'store'])->name('borrow.store');
+});
+
+
+// 4. ADMIN PANEL
+// Menggabungkan semua route admin dalam satu grup agar rapi
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    
+    // Dashboard Admin
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+
+    // Manajemen Data (CRUD)
+    Route::resource('books', AdminBookController::class);
+    Route::resource('authors', AdminAuthorController::class);
+    Route::resource('categories', AdminCategoryController::class);
+    Route::resource('staff', AdminStaffController::class);
+
+});
+
+
+// 5. STAFF PANEL
+Route::middleware(['auth', 'role:staff'])->prefix('staff')->name('staff.')->group(function () {
 
     // Dashboard Staff
-    Route::get('/staff/dashboard', [StaffController::class, 'dashboard'])
-        ->name('staff.dashboard');
+    Route::get('/dashboard', [StaffAreaController::class, 'dashboard'])->name('dashboard');
 
-    // PERBAIKAN 2: Gunakan grouping yang benar untuk Resource
-    Route::prefix('staff')       // Membuat URL diawali /staff/...
-        ->name('staff.')         // Membuat nama route diawali staff.... (PENTING!)
-        ->group(function () {
+    // Manajemen Buku oleh Staff
+    Route::resource('books', StaffBookController::class);
 
-            // Ini otomatis membuat route: staff.books.index, staff.books.store, dll
-            Route::resource('books', BookController::class);
-        });
 });
 
-// GROUP ROUTE ADMIN
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
 
-    Route::get('/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
-    Route::resource('books', AdminBookController::class);
-
-    Route::resource('categories', App\Http\Controllers\Admin\CategoryController::class);
-    Route::resource('staff', App\Http\Controllers\Admin\StaffController::class);
+// 6. MANAJEMEN MEMBER (Bisa diakses Admin & Staff)
+// Ditaruh di luar prefix khusus agar bisa dishare, tapi tetap butuh login
+Route::middleware(['auth'])->group(function () {
+    // Resource Route untuk Member
+    Route::resource('members', MemberController::class);
 });

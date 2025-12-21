@@ -9,7 +9,7 @@ class AuthController extends Controller
 {
     public function showLoginForm()
     {
-        return view('login'); // buat view login.blade.php
+        return view('auth.login');
     }
 
     public function login(Request $request)
@@ -24,11 +24,16 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
-            // PEMISAHAN ROLE
-            if (Auth::user()->role === 'admin') {
+            // === PERBAIKAN LOGIKA REDIRECT DI SINI ===
+            $role = Auth::user()->role;
+
+            if ($role === 'admin') {
                 return redirect()->intended('/admin/dashboard');
-            } else {
+            } elseif ($role === 'staff') {
                 return redirect()->intended('/staff/dashboard');
+            } else {
+                // Jika role-nya 'member', arahkan ke Dashboard Member
+                return redirect()->intended('/home');
             }
         }
 
@@ -36,14 +41,14 @@ class AuthController extends Controller
             'email' => 'Email atau password salah.',
         ]);
     }
+
     public function logout(Request $request)
     {
         Auth::logout();
-
-        // hapus session lama
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/login');
+        // Redirect ke halaman depan (Landing Page)
+        return redirect('/');
     }
 }

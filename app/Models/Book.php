@@ -33,4 +33,9 @@ class Book extends Model
     {
         return $this->belongsTo(Author::class, 'id_author');
     }
+
+    public function borrowings()
+    {
+        return $this->hasMany(Borrowing::class);
+    }
 }

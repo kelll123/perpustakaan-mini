@@ -28,6 +28,18 @@
         <div class="login-form">
             <h2>Login</h2>
 
+            @if (session('success'))
+                <div
+                    style="background-color: #d4edda; color: #155724; padding: 10px; margin-bottom: 15px; border-radius: 5px; text-align: center;">
+                    {{ session('success') }}
+                </div>
+            @endif
+            @if (session('error'))
+                <div class="error">
+                    {{ session('error') }}
+                </div>
+            @endif
+            
             @if (session('error'))
                 <div class="error">
                     {{ session('error') }}
@@ -53,14 +65,22 @@
 
                 <button type="submit" class="btn-login">Login</button>
             </form>
+            <div class="text-center mt-3">
+                <small>Belum punya akun? <a href="{{ route('register') }}" class="text-decoration-none">Daftar
+                        disini</a></small>
+            </div>
+            <br>
+            <div class="text-center mt-2">
+                <a href="{{ url('/') }}" style="text-decoration: none; color: #6c757d; font-size: 0.9em;">
+                    <i class="fa fa-arrow-left"></i> Kembali ke Beranda
+                </a>
+            </div>
 
             <div class="footer-text">
                 © {{ date('Y') }} Perpustakaan Mini
             </div>
         </div>
-
     </div>
-
 </body>
 
 </html>

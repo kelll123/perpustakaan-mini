@@ -21,7 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role',
+        'role', // <--- Cukup tulis nama kolomnya saja
     ];
 
     /**
@@ -45,5 +45,11 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    // Relasi ke Peminjaman
+    public function borrowings()
+    {
+        return $this->hasMany(Borrowing::class);
     }
 }

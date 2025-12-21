@@ -12,18 +12,27 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // Hitung Statistik
-        $totalBuku = Book::count();
-        $totalUser = User::where('role', 'staff')->count();
-        $totalAuthor = Author::has('books')->count();
-        $totalCategory = Category::count();
+        //Hitung Statistik
+        $totalBuku      = Book::count();
+        $totalUser      = User::where('role', 'staff')->count();
+        $totalAuthor    = Author::count(); // Biasanya author dihitung semua, bukan cuma yg punya buku
+        $totalCategory  = Category::count();
+        $totalMembers   = User::where('role', 'member')->count();
 
-        // AMBIL DATA BUKU (Terbaru, limit 5 atau 10 untuk dashboard)
+        //AMBIL DATA BUKU (10 Terbaru)
         $books = Book::with(['author', 'category'])
             ->latest()
-            ->limit(10) // Kita batasi 10 buku terbaru agar dashboard tidak kepanjangan
+            ->limit(10)
             ->get();
 
-        return view('admin.dashboard', compact('totalBuku', 'totalUser', 'totalAuthor', 'totalCategory', 'books'));
+        //Kirim ke View (Jangan lupa 'totalMembers' dimasukkan)
+        return view('admin.dashboard', compact(
+            'totalBuku', 
+            'totalUser', 
+            'totalAuthor', 
+            'totalCategory', 
+            'totalMembers', 
+            'books'
+        ));
     }
 }

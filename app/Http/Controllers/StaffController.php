@@ -2,25 +2,31 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use App\Models\Book;     // Gunakan Model Book (Bukan Buku)
 use Illuminate\Http\Request;
+use App\Models\Book;
+use App\Models\User;
+use App\Models\Author;
+use App\Models\Category;
 
 class StaffController extends Controller
 {
     public function dashboard()
     {
-        // Hitung total buku (Pastikan kolom 'status' sudah ada di tabel books, jika belum hapus where-nya)
-        $totalBuku = Book::count(); 
-        
-        // Ambil 5 buku terbaru
-        // Kita beri nama variabel '$books' agar cocok dengan error di view Anda
-        $books = Book::with('author')
-                    ->orderBy('created_at', 'desc')
-                    ->limit(5)
-                    ->get();
+        // Hitung Statistik (Kecuali Staff)
+        $totalBuku      = Book::count();
+        $totalAuthor    = Author::count();
+        $totalCategory  = Category::count();
+        $totalMembers   = User::where('role', 'member')->count();
 
-        // Kirim '$books' ke view, bukan '$bukuTerbaru'
-        return view('staff.dashboard', compact('totalBuku', 'books'));
+        // Ambil 5 Buku Terbaru
+        $books = Book::with(['author', 'category'])->latest()->limit(5)->get();
+
+        return view('staff.dashboard', compact(
+            'totalBuku',
+            'totalAuthor',
+            'totalCategory',
+            'totalMembers',
+            'books'
+        ));
     }
 }
