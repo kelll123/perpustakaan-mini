@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Perpustakaan Mini</title>
+    <title>Perpustakaan Mini RCL</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
@@ -42,7 +42,32 @@
             </form>
         </div>
     </div>
+    <div class="row justify-content-center mb-5">
+        <div class="col-md-8">
+            <form action="{{ route('welcome') }}" method="GET">
+                <div class="input-group input-group-lg shadow-sm">
 
+                    <select name="category_id" class="form-select" style="max-width: 200px; background-color: #f8f9fa;"
+                        onchange="this.form.submit()">
+                        <option value="">Semua Kategori</option>
+                        @foreach ($categories as $cat)
+                            <option value="{{ $cat->id }}"
+                                {{ request('category_id') == $cat->id ? 'selected' : '' }}>
+                                {{ $cat->nama_kategori }}
+                            </option>
+                        @endforeach
+                    </select>
+
+                    <input type="text" name="search" class="form-control"
+                        placeholder="Cari judul buku yang ingin kamu baca..." value="{{ request('search') }}">
+
+                    <button class="btn btn-primary px-4" type="submit">
+                        <i class="fas fa-search me-2"></i> Cari
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
     <div class="container mb-5">
         <h3 class="mb-4 border-start border-4 border-primary ps-3">Koleksi Terbaru</h3>
 

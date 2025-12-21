@@ -7,16 +7,32 @@ use App\Models\Book;
 use App\Models\Author;
 use App\Models\Category;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage; // <--- WAJIB ADA: Untuk hapus file gambar
-use Illuminate\Support\Str; // <--- Tambahan: Untuk merapikan huruf nama penulis
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class BookController extends Controller
 {
-    // 1. Menampilkan Daftar Buku
-    public function index()
+    // 1. Menampilkan Daftar Buku (SEARCH + FILTER KATEGORI)
+    public function index(Request $request)
     {
-        $books = Book::with(['author', 'category'])->latest()->paginate(10);
-        return view('admin.buku.index', compact('books'));
+      // Ambil semua kategori untuk dropdown
+        $categories = Category::all();
+
+        // Query Buku
+        $books = Book::with(['author', 'category'])
+            // 1. Filter Pencarian Judul
+            ->when($request->search, function ($query) use ($request) {
+                $query->where('title', 'like', '%' . $request->search . '%');
+            })
+            // 2. Filter Kategori (INI YANG PENTING AGAR DROPDOWN BERFUNGSI)
+            ->when($request->category_id, function ($query) use ($request) {
+                $query->where('id_category', $request->category_id);
+            })
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('admin.buku.index', compact('books', 'categories'));
     }
 
     // 2. Form Tambah Buku
@@ -46,7 +62,7 @@ class BookController extends Controller
             $coverPath = $request->file('cover')->store('covers', 'public');
         }
 
-        // PERBAIKAN: Rapikan nama penulis (Hapus spasi, Huruf Besar Awal)
+        // Rapikan nama penulis
         $namaAuthor = Str::title(trim($request->nama_author));
         $author = Author::firstOrCreate(['nama_author' => $namaAuthor]);
 
@@ -86,7 +102,7 @@ class BookController extends Controller
             'cover'       => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        // PERBAIKAN: Rapikan nama penulis juga saat update
+        // Rapikan nama penulis
         $namaAuthor = Str::title(trim($request->nama_author));
         $author = Author::firstOrCreate(['nama_author' => $namaAuthor]);
 
@@ -125,7 +141,7 @@ class BookController extends Controller
         return redirect()->route('admin.books.index')->with('success', 'Buku berhasil diperbarui!');
     }
 
-    // 6. HAPUS BUKU (INI YANG TADI HILANG/ERROR)
+    // 6. Hapus Buku
     public function destroy($id)
     {
         $book = Book::findOrFail($id);
@@ -141,7 +157,7 @@ class BookController extends Controller
         // Hapus Buku
         $book->delete();
 
-        // Cek Penulis: Jika penulis ini bukunya sudah 0 (habis), hapus penulisnya dari database
+        // Cek Penulis: Jika penulis ini bukunya sudah 0 (habis), hapus penulisnya
         $author = Author::find($authorId);
         if ($author && $author->books()->count() == 0) {
             $author->delete();

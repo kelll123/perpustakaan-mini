@@ -8,22 +8,43 @@ use App\Models\Author;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str; // Tambahkan ini untuk manipulasi string
+use Illuminate\Support\Str;
 
 class BookController extends Controller
 {
-    public function index()
+    // 1. Menampilkan Daftar Buku (SEARCH + FILTER KATEGORI)
+    public function index(Request $request)
     {
-        $books = Book::with(['author', 'category'])->latest()->paginate(10);
-        return view('staff.buku.index', compact('books'));
+        // Ambil semua kategori untuk isi dropdown filter
+        $categories = Category::all();
+
+        // Query Buku dengan Filter Pencarian & Kategori
+        $books = Book::with(['author', 'category'])
+            // Filter 1: Pencarian Judul
+            ->when($request->search, function ($query) use ($request) {
+                $query->where('title', 'like', '%' . $request->search . '%');
+            })
+            // Filter 2: Pilihan Kategori (LOGIKA PENTING)
+            ->when($request->category_id, function ($query) use ($request) {
+                // Pastikan nama kolom di database Anda 'id_category'
+                $query->where('id_category', $request->category_id);
+            })
+            ->latest()
+            ->paginate(10)
+            ->withQueryString(); // Agar filter tidak hilang saat pindah halaman
+
+        // Kirim data buku dan kategori ke view staff
+        return view('staff.buku.index', compact('books', 'categories'));
     }
 
+    // 2. Form Tambah Buku
     public function create()
     {
         $categories = Category::all();
         return view('staff.buku.create', compact('categories'));
     }
 
+    // 3. Simpan Buku Baru
     public function store(Request $request)
     {
         $request->validate([
@@ -41,10 +62,7 @@ class BookController extends Controller
             $coverPath = $request->file('cover')->store('covers', 'public');
         }
 
-        // REVISI 1: NORMALISASI NAMA PENULIS
-        // " tere liye " -> "Tere Liye" (Hapus spasi, huruf besar di awal kata)
         $namaAuthor = Str::title(trim($request->nama_author));
-        
         $author = Author::firstOrCreate(['nama_author' => $namaAuthor]);
 
         Book::create([
@@ -60,13 +78,15 @@ class BookController extends Controller
         return redirect()->route('staff.books.index')->with('success', 'Buku berhasil ditambahkan!');
     }
 
+    // 4. Form Edit Buku
     public function edit($id)
     {
-        $book = Book::with(['author', 'category'])->findOrFail($id);
+        $book = Book::with('author')->findOrFail($id);
         $categories = Category::all();
         return view('staff.buku.edit', compact('book', 'categories'));
     }
 
+    // 5. Update Buku
     public function update(Request $request, $id)
     {
         $book = Book::findOrFail($id);
@@ -81,7 +101,6 @@ class BookController extends Controller
             'cover'       => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        // REVISI 1: NORMALISASI JUGA DI UPDATE
         $namaAuthor = Str::title(trim($request->nama_author));
         $author = Author::firstOrCreate(['nama_author' => $namaAuthor]);
 
@@ -101,13 +120,9 @@ class BookController extends Controller
             $data['cover'] = $request->file('cover')->store('covers', 'public');
         }
 
-        // Simpan Author ID Lama untuk dicek nanti
         $oldAuthorId = $book->id_author;
-
         $book->update($data);
 
-        // REVISI 2: BERSIHKAN AUTHOR LAMA JIKA TIDAK PUNYA BUKU LAGI
-        // Jika penulis berubah, cek penulis lama. Kalau bukunya 0, hapus.
         if ($oldAuthorId != $author->id) {
             $oldAuthor = Author::find($oldAuthorId);
             if ($oldAuthor && $oldAuthor->books()->count() == 0) {
@@ -118,25 +133,23 @@ class BookController extends Controller
         return redirect()->route('staff.books.index')->with('success', 'Buku berhasil diperbarui!');
     }
 
+    // 6. Hapus Buku
     public function destroy($id)
     {
         $book = Book::findOrFail($id);
-        $authorId = $book->id_author; // Simpan ID penulis sebelum buku dihapus
+        $authorId = $book->id_author;
 
-        // Hapus Cover
         if ($book->cover && Storage::exists('public/' . $book->cover)) {
             Storage::delete('public/' . $book->cover);
         }
 
-        // Hapus Buku
         $book->delete();
 
-        // REVISI 2: HAPUS PENULIS JIKA BUKUNYA HABIS
         $author = Author::find($authorId);
         if ($author && $author->books()->count() == 0) {
             $author->delete();
         }
 
-        return redirect()->route('staff.books.index')->with('success', 'Buku dihapus & Data Penulis dirapikan!');
+        return redirect()->route('staff.books.index')->with('success', 'Buku berhasil dihapus!');
     }
 }

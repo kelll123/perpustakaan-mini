@@ -1,0 +1,138 @@
+/* public/css/auth.css */
+
+body {
+    font-family: 'Poppins', sans-serif;
+
+    /* 1. Warna dasar sedikit lebih gelap agar kartu putih lebih menonjol */
+    background-color: #e9ecef;
+
+    /* 2. PATTERN IKON BUKU HALUS (SVG DATA URI) */
+    /* Ini adalah gambar pola buku yang dikodekan menjadi teks agar ringan */
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23adb5bd' fill-opacity='0.25'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3Cpath d='M12 12h36v36H12z' fill-opacity='0.1'/%3E%3Cpath d='M14 14h32v32H14zM16 16h28v28H16z'/%3E%3Cpath d='M18 18h5v5h-5zM25 18h5v5h-5zM32 18h5v5h-5zM39 18h5v5h-5z'/%3E%3Cpath d='M18 25h26v2H18zM18 30h26v2H18zM18 35h26v2H18zM18 40h26v2H18z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+
+    /* Membuat pola berulang */
+    background-repeat: repeat;
+    background-position: center;
+
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* CONTAINER UTAMA */
+.auth-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    width: 100%;
+    max-width: 900px;
+    min-height: 550px;
+    display: flex;
+}
+
+/* BAGIAN GAMBAR (KIRI) */
+.auth-image-side {
+    background: url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80') no-repeat center center;
+    background-size: cover;
+    position: relative;
+    width: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-align: center;
+    padding: 30px;
+}
+
+/* Overlay Biru di atas gambar agar teks terbaca */
+.auth-image-side::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(13, 110, 253, 0.9) 0%, rgba(0, 67, 168, 0.8) 100%);
+    z-index: 1;
+}
+
+.auth-image-content {
+    position: relative;
+    z-index: 2;
+}
+
+/* BAGIAN FORM (KANAN) */
+.auth-form-side {
+    width: 50%;
+    padding: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* CUSTOM INPUT */
+.form-floating>.form-control {
+    border-radius: 10px;
+    border: 1px solid #dee2e6;
+    height: 50px;
+}
+
+.form-floating>.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+}
+
+.btn-primary {
+    padding: 12px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3);
+}
+
+.auth-link {
+    color: #0d6efd;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.auth-link:hover {
+    text-decoration: underline;
+}
+
+/* RESPONSIF (HP) */
+@media (max-width: 768px) {
+    .auth-card {
+        flex-direction: column;
+        max-width: 400px;
+        min-height: auto;
+        margin: 20px;
+    }
+
+    .auth-image-side {
+        width: 100%;
+        height: 150px;
+        padding: 20px;
+    }
+
+    .auth-form-side {
+        width: 100%;
+        padding: 30px;
+    }
+
+    .auth-image-content h2 {
+        font-size: 1.5rem;
+    }
+
+    .auth-image-content p {
+        display: none;
+        /* Sembunyikan deskripsi di HP biar ringkas */
+    }
+}

@@ -4,20 +4,32 @@ namespace App\Http\Controllers;
 
 use App\Models\Book;
 use Illuminate\Http\Request;
+use App\Models\Category;
 
 class GuestController extends Controller
 {
     public function index(Request $request)
     {
-        $books = Book::with(['category', 'author'])
+        // 1. Ambil data Kategori (Untuk Dropdown)
+        $categories = Category::all();
+
+        // 2. Query Buku (Search + Filter Kategori)
+        $books = Book::with(['author', 'category'])
+            // Filter Search Judul
             ->when($request->search, function ($query) use ($request) {
                 $query->where('title', 'like', '%' . $request->search . '%');
             })
-            // ->where('status', 'aktif')  <-- KASIH GARIS MIRING (KOMENTAR) DI SINI
+            // Filter Kategori (Dropdown)
+            ->when($request->category_id, function ($query) use ($request) {
+                $query->where('id_category', $request->category_id);
+            })
+            // Hanya tampilkan buku yang statusnya 'aktif' (Opsional, tapi bagus untuk guest)
+            ->where('status', 'aktif')
             ->latest()
-            ->paginate(8);
+            ->paginate(8) // Tampilkan 8 buku per halaman biar rapi
+            ->withQueryString();
 
-        return view('guest.index', compact('books'));
+        return view('welcome', compact('books', 'categories'));
     }
     public function show($id)
     {

@@ -3,85 +3,84 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Daftar | Perpustakaan Mini</title>
-
-    <link rel="stylesheet" href="{{ asset('css/login.css') }}">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar - PerpusMini</title>
+    {{-- Fonts & Bootstrap --}}
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    {{-- CSS Auth --}}
+    <link rel="stylesheet" href="{{ asset('css/auth.css') }}">
 </head>
 
 <body>
 
-    <div class="login-wrapper">
-
-        <div class="login-image">
-            <div class="login-image-content">
-                <h3>Perpustakaan Mini</h3>
-                <p>Bergabunglah menjadi member kami</p>
+    <div class="auth-card">
+        <div class="auth-image-side">
+            <div class="auth-image-content">
+                <i class="fas fa-user-plus fa-3x mb-3"></i>
+                <h2 class="fw-bold">Bergabunglah</h2>
+                <p class="opacity-75 mt-3">Buat akun sekarang dan mulai petualangan membaca Anda bersama PerpusMini.</p>
             </div>
         </div>
 
-        <div class="login-form">
-            <h2>Daftar Akun</h2>
-
-            @if ($errors->any())
-                <div class="error" style="color: red; font-size: 0.9em; margin-bottom: 15px;">
-                    <ul style="list-style: none; padding: 0;">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
+        <div class="auth-form-side">
+            <div class="mb-4">
+                <h3 class="fw-bold mb-1">Buat Akun Baru 🚀</h3>
+                <p class="text-muted small">Lengkapi data diri Anda untuk mendaftar.</p>
+            </div>
 
             <form method="POST" action="{{ route('register') }}">
                 @csrf
 
-                <div class="form-group">
-                    <div class="input-icon">
-                        <i class="fa fa-user"></i>
-                        <input type="text" name="name" placeholder="Nama Lengkap" value="{{ old('name') }}"
-                            required>
-                    </div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control @error('name') is-invalid @enderror" id="name"
+                        name="name" placeholder="Nama Lengkap" value="{{ old('name') }}" required autofocus>
+                    <label for="name">Nama Lengkap</label>
+                    @error('name')
+                        <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
+                    @enderror
                 </div>
 
-                <div class="form-group">
-                    <div class="input-icon">
-                        <i class="fa fa-envelope"></i>
-                        <input type="email" name="email" placeholder="Masukkan email" value="{{ old('email') }}"
-                            required>
-                    </div>
+                <div class="form-floating mb-3">
+                    <input type="email" class="form-control @error('email') is-invalid @enderror" id="email"
+                        name="email" placeholder="name@example.com" value="{{ old('email') }}" required>
+                    <label for="email">Alamat Email</label>
+                    @error('email')
+                        <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
+                    @enderror
                 </div>
 
-                <div class="form-group">
-                    <div class="input-icon">
-                        <i class="fa fa-lock"></i>
-                        <input type="password" name="password" placeholder="Password (min. 8 karakter)" required>
-                    </div>
+                <div class="form-floating mb-3">
+                    <input type="password" class="form-control @error('password') is-invalid @enderror" id="password"
+                        name="password" placeholder="Password" required>
+                    <label for="password">Kata Sandi</label>
+                    @error('password')
+                        <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
+                    @enderror
                 </div>
 
-                <div class="form-group">
-                    <div class="input-icon">
-                        <i class="fa fa-key"></i>
-                        <input type="password" name="password_confirmation" placeholder="Ulangi Password" required>
-                    </div>
+                <div class="form-floating mb-4">
+                    <input type="password" class="form-control" id="password-confirm" name="password_confirmation"
+                        placeholder="Confirm Password" required>
+                    <label for="password-confirm">Konfirmasi Kata Sandi</label>
                 </div>
 
-                <button type="submit" class="btn-login">Daftar Sekarang</button>
+                <button type="submit" class="btn btn-primary w-100 mb-3">
+                    Daftar Sekarang
+                </button>
+
+                <div class="text-center small text-muted">
+                    Sudah punya akun? <a href="{{ route('login') }}" class="auth-link">Login disini</a>
+                </div>
+
+                <div class="text-center mt-4">
+                    <a href="{{ url('/') }}" class="text-decoration-none text-secondary small">
+                        <i class="fas fa-arrow-left me-1"></i> Kembali ke Beranda
+                    </a>
+                </div>
             </form>
-
-            <div class="text-center mt-3" style="text-align: center; margin-top: 15px;">
-                <small>Sudah punya akun? <a href="{{ route('login') }}" style="text-decoration: none;">Login
-                        disini</a></small>
-            </div>
-
-            <div class="text-center mt-2" style="text-align: center;">
-                <a href="{{ url('/') }}" style="text-decoration: none; color: #6c757d; font-size: 0.9em;">
-                    <i class="fa fa-arrow-left"></i> Kembali ke Beranda
-                </a>
-            </div>
         </div>
-
     </div>
 
 </body>
