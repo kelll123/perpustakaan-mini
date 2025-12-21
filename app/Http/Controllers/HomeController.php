@@ -2,18 +2,29 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
+use App\Models\Borrowing; 
 use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
 {
     public function index()
     {
-        /** @var \App\Models\User $user */
-        $user = Auth::user();
+        $userId = Auth::id();
 
-        // Sekarang VS Code tahu variabel $user punya borrowings
-        $borrowings = $user->borrowings()->with('book')->latest()->get();
+        // 1. Data yang SEDANG DIPINJAM
+        $activeBorrows = Borrowing::with('book')
+            ->where('user_id', $userId)
+            ->where('status', 'dipinjam')
+            ->get();
 
-        return view('member.dashboard', compact('borrowings'));
+        // 2. Data RIWAYAT (SUDAH KEMBALI)
+        $historyBorrows = Borrowing::with('book')
+            ->where('user_id', $userId)
+            ->where('status', 'dikembalikan')
+            ->latest()
+            ->get();
+
+        return view('member.dashboard', compact('activeBorrows', 'historyBorrows'));
     }
 }

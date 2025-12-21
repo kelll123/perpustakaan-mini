@@ -9,14 +9,13 @@ class GuestController extends Controller
 {
     public function index(Request $request)
     {
-        // Ambil data buku, jika ada pencarian (search) filter datanya
         $books = Book::with(['category', 'author'])
             ->when($request->search, function ($query) use ($request) {
                 $query->where('title', 'like', '%' . $request->search . '%');
             })
-            ->where('status', 'aktif') // Hanya tampilkan buku aktif
+            // ->where('status', 'aktif')  <-- KASIH GARIS MIRING (KOMENTAR) DI SINI
             ->latest()
-            ->paginate(8); // Tampilkan 8 buku per halaman
+            ->paginate(8);
 
         return view('guest.index', compact('books'));
     }

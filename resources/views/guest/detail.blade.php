@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $book->title }} - Detail Buku</title>
 
-    {{-- Menggunakan CSS Login kamu agar konsisten, atau Bootstrap --}}
+    {{-- Bootstrap & Font Awesome --}}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
@@ -34,8 +34,20 @@
         <div class="container">
             <a class="navbar-brand fw-bold" href="{{ url('/') }}">📚 Perpustakaan Mini</a>
             <div class="ms-auto">
-                <a href="{{ route('login') }}" class="btn btn-light btn-sm fw-bold text-primary">Login</a>
-                <a href="{{ route('register') }}" class="btn btn-outline-light btn-sm fw-bold">Daftar</a>
+                @auth
+                    {{-- Jika sudah login, tampilkan tombol ke Dashboard & Logout --}}
+                    <div class="d-flex align-items-center gap-2">
+                        <a href="{{ url('/home') }}" class="btn btn-light btn-sm fw-bold text-primary">Dashboard</a>
+                        <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                            @csrf
+                            <button type="submit" class="btn btn-outline-light btn-sm fw-bold">Logout</button>
+                        </form>
+                    </div>
+                @else
+                    {{-- Jika belum login, tampilkan Login & Daftar --}}
+                    <a href="{{ route('login') }}" class="btn btn-light btn-sm fw-bold text-primary">Login</a>
+                    <a href="{{ route('register') }}" class="btn btn-outline-light btn-sm fw-bold">Daftar</a>
+                @endauth
             </div>
         </div>
     </nav>
@@ -44,6 +56,19 @@
         <a href="{{ url('/') }}" class="text-decoration-none text-secondary mb-3 d-inline-block">
             <i class="fa fa-arrow-left"></i> Kembali ke Daftar Buku
         </a>
+
+        @if (session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+        @if (session('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
 
         <div class="card shadow-sm border-0 overflow-hidden">
             <div class="card-body p-0">
@@ -101,11 +126,27 @@
 
                         <div class="d-grid gap-2">
                             @if ($book->stock > 0)
-                                <a href="{{ route('login') }}" class="btn btn-primary btn-lg">
-                                    <i class="fa fa-sign-in-alt me-2"></i> Login untuk Pinjam
-                                </a>
+                                {{-- JIKA STOK ADA --}}
+                                @auth
+                                    {{-- SKENARIO 1: USER SUDAH LOGIN -> TAMPILKAN TOMBOL PINJAM --}}
+                                    <form action="{{ route('borrow.store', $book->id) }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="btn btn-primary btn-lg w-100"
+                                            onclick="return confirm('Apakah Anda yakin ingin meminjam buku {{ $book->title }}?')">
+                                            <i class="fa fa-book-reader me-2"></i> Pinjam Buku Ini
+                                        </button>
+                                    </form>
+                                @else
+                                    {{-- SKENARIO 2: USER BELUM LOGIN -> TAMPILKAN TOMBOL LOGIN --}}
+                                    <a href="{{ route('login') }}" class="btn btn-outline-primary btn-lg">
+                                        <i class="fa fa-sign-in-alt me-2"></i> Login untuk Pinjam
+                                    </a>
+                                @endauth
                             @else
-                                <button class="btn btn-secondary btn-lg" disabled>Stok Habis</button>
+                                {{-- SKENARIO 3: STOK HABIS --}}
+                                <button class="btn btn-secondary btn-lg" disabled>
+                                    <i class="fa fa-ban me-2"></i> Stok Habis
+                                </button>
                             @endif
                         </div>
 
@@ -119,6 +160,8 @@
         &copy; {{ date('Y') }} Perpustakaan Mini
     </div>
 
+    {{-- Script Bootstrap --}}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

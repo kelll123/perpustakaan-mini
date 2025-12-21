@@ -7,8 +7,14 @@
             <i class="fas fa-tachometer-alt me-2 text-primary"></i>Dashboard Overview
         </h2>
 
-        <div class="row g-4 mb-4">
+        @if (session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
 
+        <div class="row g-4 mb-4">
             <div class="col-xl-4 col-md-6">
                 <div class="card bg-primary text-white mb-4 shadow h-100 border-0">
                     <div class="card-body d-flex align-items-center justify-content-between">
@@ -65,7 +71,6 @@
         </div>
 
         <div class="row g-4 mb-5">
-
             <div class="col-xl-6 col-md-6">
                 <div class="card bg-info text-white shadow h-100 border-0">
                     <div class="card-body d-flex align-items-center justify-content-between">
@@ -99,6 +104,65 @@
                             href="{{ route('admin.staff.index') }}">Lihat Detail</a>
                         <div class="small text-white"><i class="fas fa-angle-right"></i></div>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow mb-5 border-0 border-start border-4 border-warning">
+            <div class="card-header py-3 bg-white">
+                <h5 class="m-0 fw-bold text-dark">
+                    <i class="fas fa-clipboard-check me-2 text-warning"></i>Verifikasi Pengembalian Buku
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Peminjam</th>
+                                <th>Buku</th>
+                                <th>Tgl Pinjam</th>
+                                <th>Wajib Kembali</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($ongoingBorrows as $borrow)
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="ms-2">
+                                                <div class="fw-bold">{{ $borrow->user->name }}</div>
+                                                <div class="text-muted small">Member</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>{{ $borrow->book->title }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($borrow->borrow_date)->format('d M Y') }}</td>
+                                    <td class="text-danger fw-bold">
+                                        {{ \Carbon\Carbon::parse($borrow->return_date)->format('d M Y') }}
+                                    </td>
+                                    <td>
+                                        <form action="{{ route('admin.book.return', $borrow->id) }}" method="POST"
+                                            onsubmit="return confirm('Apakah fisik buku sudah diterima dan dicek kondisinya?')">
+                                            @csrf
+                                            @method('PUT')
+                                            <button type="submit" class="btn btn-success btn-sm text-white">
+                                                <i class="fas fa-check me-1"></i> Terima Buku
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="text-center py-4 text-muted">
+                                        <i class="fas fa-check-circle fa-2x mb-2 text-success opacity-50"></i>
+                                        <p class="mb-0">Tidak ada peminjaman aktif saat ini.</p>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

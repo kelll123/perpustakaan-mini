@@ -50,13 +50,21 @@
             @forelse($books as $book)
                 <div class="col-md-3 mb-4">
                     <div class="card h-100 shadow-sm border-0">
-                        <img src="{{ $book->cover ? asset('storage/' . $book->cover) : 'https://via.placeholder.com/150x220?text=No+Cover' }}"
-                            class="card-img-top" alt="{{ $book->title }}" style="height: 300px; object-fit: cover;">
+
+                        <a href="{{ route('book.detail', $book->id) }}">
+                            <img src="{{ $book->cover ? asset('storage/' . $book->cover) : 'https://via.placeholder.com/150x220?text=No+Cover' }}"
+                                class="card-img-top" alt="{{ $book->title }}"
+                                style="height: 300px; object-fit: cover;">
+                        </a>
 
                         <div class="card-body">
                             <span
                                 class="badge bg-info text-dark mb-2">{{ $book->category->nama_kategori ?? 'Umum' }}</span>
-                            <h5 class="card-title text-truncate">{{ $book->title }}</h5>
+
+                            <a href="{{ route('book.detail', $book->id) }}" class="text-decoration-none text-dark">
+                                <h5 class="card-title text-truncate">{{ $book->title }}</h5>
+                            </a>
+
                             <p class="card-text text-muted small">Penulis: {{ $book->author->nama_author ?? '-' }}</p>
 
                             <div class="d-grid">

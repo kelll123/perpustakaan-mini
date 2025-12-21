@@ -30,7 +30,7 @@ Route::get('/book/{id}', [GuestController::class, 'show'])->name('book.detail');
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
-    
+
     Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
     Route::post('/register', [RegisterController::class, 'register']);
 });
@@ -42,7 +42,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 Route::middleware(['auth'])->group(function () {
     // Dashboard Member
     Route::get('/home', [HomeController::class, 'index'])->name('home');
-    
+
     // Proses Pinjam Buku
     Route::post('/borrow/{id}', [BorrowController::class, 'store'])->name('borrow.store');
 });
@@ -51,7 +51,7 @@ Route::middleware(['auth'])->group(function () {
 // 4. ADMIN PANEL
 // Menggabungkan semua route admin dalam satu grup agar rapi
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
-    
+
     // Dashboard Admin
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
@@ -61,6 +61,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::resource('categories', AdminCategoryController::class);
     Route::resource('staff', AdminStaffController::class);
 
+    // Route untuk memproses pengembalian buku
+    Route::put('/return-book/{id}', [AdminDashboardController::class, 'returnBook'])->name('book.return');
 });
 
 
@@ -72,7 +74,6 @@ Route::middleware(['auth', 'role:staff'])->prefix('staff')->name('staff.')->grou
 
     // Manajemen Buku oleh Staff
     Route::resource('books', StaffBookController::class);
-
 });
 
 
