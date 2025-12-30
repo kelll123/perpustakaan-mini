@@ -12,40 +12,40 @@ class MemberController extends Controller
     public function index()
     {
         // Ambil hanya user dengan role 'member'
-        $members = User::where('role', 'member')->latest()->get();
-        return view('admin.members.index', compact('members'));
+        $members = \App\Models\User::where('role', 'member')->latest()->get();
+        return view('admin.member.index', compact('members')); // Hapus huruf 's' pada member
     }
 
     // 2. Tampilkan Form Tambah
     public function create()
     {
-        return view('admin.members.create');
+        return view('admin.member.create');
     }
 
     // 3. Simpan Member Baru
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|min:8',
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
         ]);
 
         User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => 'member', // Paksa role jadi member
+            'password' => bcrypt($request->password),
+            'role' => 'member', // Menandakan user baru adalah member
         ]);
 
-        return redirect()->route('members.index')->with('success', 'Member berhasil ditambahkan!');
+        return redirect()->route('members.index')->with('success', 'Member baru berhasil ditambahkan!');
     }
 
     // 4. Tampilkan Form Edit
     public function edit($id)
     {
         $member = User::findOrFail($id);
-        return view('admin.members.edit', compact('member'));
+        return view('admin.member.edit', compact('member'));
     }
 
     // 5. Update Data Member

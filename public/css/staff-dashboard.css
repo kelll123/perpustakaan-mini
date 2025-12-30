@@ -1,0 +1,17 @@
+.nav-link.active {
+    background: #ecfdf5 !important; /* Hijau Emerald Sangat Muda */
+    color: #059669 !important; /* Hijau Emerald Tua */
+    font-weight: 700;
+    border-radius: 12px;
+}
+
+.nav-link {
+    color: #64748b;
+    padding: 12px 20px;
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover:not(.active) {
+    background: #f8fafc;
+    border-radius: 12px;
+}

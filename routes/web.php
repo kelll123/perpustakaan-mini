@@ -74,12 +74,13 @@ Route::middleware(['auth', 'role:staff'])->prefix('staff')->name('staff.')->grou
 
     // Manajemen Buku oleh Staff
     Route::resource('books', StaffBookController::class);
+
+    // TAMBAHKAN INI: Agar staff punya halaman member dengan prefix staff.members
+    Route::get('/members', [StaffAreaController::class, 'members'])->name('members.index');
 });
 
 
-// 6. MANAJEMEN MEMBER (Bisa diakses Admin & Staff)
-// Ditaruh di luar prefix khusus agar bisa dishare, tapi tetap butuh login
-Route::middleware(['auth'])->group(function () {
-    // Resource Route untuk Member
+// 6. MANAJEMEN MEMBER (Khusus Admin)
+Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('members', MemberController::class);
 });
