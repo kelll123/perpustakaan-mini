@@ -62,7 +62,6 @@
             <h1 class="display-4 fw-bold mb-3">Temukan Buku Favoritmu</h1>
             <p class="lead mb-5 opacity-75">Akses ribuan koleksi buku digital dan fisik dengan mudah,<br>kapan saja dan
                 di mana saja.</p>
-                <h1>TES</h1>
 
             <div class="row justify-content-center">
                 <div class="col-lg-8">
