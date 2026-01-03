@@ -109,6 +109,14 @@
                 class="nav-link {{ request()->routeIs('staff.members.index') ? 'active' : '' }}">
                 <i class="fas fa-users"></i> Data Member
             </a>
+            <a href="{{ route('staff.authors.index') }}"
+                class="nav-link mb-2 {{ request()->is('staff/authors*') ? 'active' : '' }}">
+                <i class="fas fa-pen-nib"></i> Penulis
+            </a>
+            <a href="{{ route('staff.categories.index') }}"
+                class="nav-link mb-2 {{ request()->is('staff/categories*') ? 'active' : '' }}">
+                <i class="fas fa-tags"></i> Kategori
+            </a>
 
             <div class="mt-auto pt-5">
                 <form action="{{ route('logout') }}" method="POST">

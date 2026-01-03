@@ -21,13 +21,14 @@ use App\Http\Controllers\Staff\BookController as StaffBookController;
 
 
 
-// 1. HALAMAN DEPAN (GUEST)
+//HALAMAN DEPAN GUEST
 Route::get('/', [GuestController::class, 'index'])->name('welcome');
 
 Route::get('/book/{id}', [GuestController::class, 'show'])->name('book.detail');
 
-// 2. AUTHENTICATION (Login, Logout, Register)
+//Login, Logout, Register
 Route::middleware('guest')->group(function () {
+
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
 
@@ -38,18 +39,15 @@ Route::middleware('guest')->group(function () {
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
 
-// 3. MEMBER AREA (Peminjam)
+//MEMBER AREA (Peminjam)
 Route::middleware(['auth'])->group(function () {
-    // Dashboard Member
-    Route::get('/home', [HomeController::class, 'index'])->name('home');
 
-    // Proses Pinjam Buku
+    Route::get('/home', [HomeController::class, 'index'])->name('home');
     Route::post('/borrow/{id}', [BorrowController::class, 'store'])->name('borrow.store');
 });
 
 
-// 4. ADMIN PANEL
-// Menggabungkan semua route admin dalam satu grup agar rapi
+// ADMIN PANEL
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
 
     // Dashboard Admin
@@ -69,14 +67,24 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 // 5. STAFF PANEL
 Route::middleware(['auth', 'role:staff'])->prefix('staff')->name('staff.')->group(function () {
 
-    // Dashboard Staff
     Route::get('/dashboard', [StaffAreaController::class, 'dashboard'])->name('dashboard');
 
-    // Manajemen Buku oleh Staff
     Route::resource('books', StaffBookController::class);
-
-    // TAMBAHKAN INI: Agar staff punya halaman member dengan prefix staff.members
     Route::get('/members', [StaffAreaController::class, 'members'])->name('members.index');
+    Route::put('/return-book/{id}', [StaffAreaController::class, 'returnBook'])->name('book.return');
+    Route::get('/authors', [StaffAreaController::class, 'authors'])->name('authors.index');
+    Route::get('/categories', [StaffAreaController::class, 'categories'])->name('categories.index');
+
+    //CRUD penulis
+    Route::post('/authors', [StaffAreaController::class, 'storeAuthor'])->name('authors.store');
+    Route::put('/authors/{id}', [StaffAreaController::class, 'updateAuthor'])->name('authors.update');
+    Route::delete('/authors/{id}', [StaffAreaController::class, 'destroyAuthor'])->name('authors.destroy');
+
+    // CRUD Kategori
+    Route::get('/categories', [StaffAreaController::class, 'categories'])->name('categories.index');
+    Route::post('/categories', [StaffAreaController::class, 'storeCategory'])->name('categories.store');
+    Route::put('/categories/{id}', [StaffAreaController::class, 'updateCategory'])->name('categories.update');
+    Route::delete('/categories/{id}', [StaffAreaController::class, 'destroyCategory'])->name('categories.destroy');
 });
 
 
