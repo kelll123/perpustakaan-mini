@@ -15,25 +15,19 @@ class BookController extends Controller
     // 1. Menampilkan Daftar Buku (SEARCH + FILTER KATEGORI)
     public function index(Request $request)
     {
-        // Ambil semua kategori untuk isi dropdown filter
         $categories = Category::all();
 
-        // Query Buku dengan Filter Pencarian & Kategori
         $books = Book::with(['author', 'category'])
-            // Filter 1: Pencarian Judul
             ->when($request->search, function ($query) use ($request) {
                 $query->where('title', 'like', '%' . $request->search . '%');
             })
-            // Filter 2: Pilihan Kategori (LOGIKA PENTING)
             ->when($request->category_id, function ($query) use ($request) {
-                // Pastikan nama kolom di database Anda 'id_category'
                 $query->where('id_category', $request->category_id);
             })
             ->latest()
             ->paginate(10)
-            ->withQueryString(); // Agar filter tidak hilang saat pindah halaman
+            ->withQueryString();
 
-        // Kirim data buku dan kategori ke view staff
         return view('staff.buku.index', compact('books', 'categories'));
     }
 
@@ -52,6 +46,7 @@ class BookController extends Controller
             'nama_author' => 'required|string|max:255',
             'id_category' => 'required|exists:categories,id',
             'stock'       => 'required|integer|min:0',
+            'tahun_terbit' => 'required|integer|min:1000|max:' . (date('Y') + 1), // Validasi tahun
             'deskripsi'   => 'nullable|string',
             'status'      => 'required|in:aktif,nonaktif',
             'cover'       => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
@@ -70,6 +65,7 @@ class BookController extends Controller
             'id_author'   => $author->id,
             'id_category' => $request->id_category,
             'stock'       => $request->stock,
+            'tahun_terbit' => $request->tahun_terbit, // Tambahkan ini
             'deskripsi'   => $request->deskripsi,
             'status'      => $request->status,
             'cover'       => $coverPath,
@@ -96,6 +92,7 @@ class BookController extends Controller
             'nama_author' => 'required|string|max:255',
             'id_category' => 'required|exists:categories,id',
             'stock'       => 'required|integer|min:0',
+            'tahun_terbit' => 'required|integer|min:1000|max:' . (date('Y') + 1), // Validasi tahun
             'deskripsi'   => 'nullable|string',
             'status'      => 'required|in:aktif,nonaktif',
             'cover'       => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
@@ -109,6 +106,7 @@ class BookController extends Controller
             'id_author'   => $author->id,
             'id_category' => $request->id_category,
             'stock'       => $request->stock,
+            'tahun_terbit' => $request->tahun_terbit, // Pastikan ada di array data
             'deskripsi'   => $request->deskripsi,
             'status'      => $request->status,
         ];

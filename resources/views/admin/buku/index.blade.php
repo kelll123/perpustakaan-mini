@@ -60,6 +60,7 @@
                                 <th>Judul Buku</th>
                                 <th>Penulis</th>
                                 <th>Kategori</th>
+                                <th width="8%">Tahun</th> 
                                 <th width="8%">Stok</th>
                                 <th width="10%">Status</th>
                                 <th width="12%">Aksi</th>
@@ -87,8 +88,14 @@
 
                                     <td class="fw-bold text-dark">{{ $book->title }}</td>
                                     <td>{{ $book->author->nama_author ?? '-' }}</td>
-                                    <td><span
-                                            class="badge bg-light text-dark border">{{ $book->category->nama_kategori ?? '-' }}</span>
+                                    <td>
+                                        <span class="badge bg-light text-dark border">
+                                            {{ $book->category->nama_kategori ?? '-' }}
+                                        </span>
+                                    </td>
+                                    {{-- DATA TAHUN TERBIT --}}
+                                    <td class="text-center text-secondary fw-bold">
+                                        {{ $book->tahun_terbit ?? '-' }}
                                     </td>
                                     <td class="text-center fw-bold">{{ $book->stock }}</td>
                                     <td class="text-center">
@@ -117,7 +124,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="8" class="text-center py-5 text-muted">
+                                    <td colspan="9" class="text-center py-5 text-muted"> {{-- Colspan jadi 9 --}}
                                         <i class="fas fa-folder-open fa-3x mb-3 opacity-50"></i>
                                         <p>Tidak ada data buku yang ditemukan.</p>
                                     </td>
@@ -128,7 +135,6 @@
                 </div>
 
                 <div class="mt-3">
-                    {{-- Menambahkan appends agar query search & category tidak hilang saat pindah halaman --}}
                     {{ $books->appends(request()->query())->links() }}
                 </div>
             </div>

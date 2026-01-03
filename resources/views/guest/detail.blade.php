@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $book->title }} - Detail Buku</title>
 
-    {{-- Bootstrap & Font Awesome --}}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
@@ -35,7 +34,6 @@
             <a class="navbar-brand fw-bold" href="{{ url('/') }}">📚 Perpustakaan Mini</a>
             <div class="ms-auto">
                 @auth
-                    {{-- Jika sudah login, tampilkan tombol ke Dashboard & Logout --}}
                     <div class="d-flex align-items-center gap-2">
                         <a href="{{ url('/home') }}" class="btn btn-light btn-sm fw-bold text-primary">Dashboard</a>
                         <form action="{{ route('logout') }}" method="POST" class="d-inline">
@@ -44,7 +42,6 @@
                         </form>
                     </div>
                 @else
-                    {{-- Jika belum login, tampilkan Login & Daftar --}}
                     <a href="{{ route('login') }}" class="btn btn-light btn-sm fw-bold text-primary">Login</a>
                     <a href="{{ route('register') }}" class="btn btn-outline-light btn-sm fw-bold">Daftar</a>
                 @endauth
@@ -126,9 +123,7 @@
 
                         <div class="d-grid gap-2">
                             @if ($book->stock > 0)
-                                {{-- JIKA STOK ADA --}}
                                 @auth
-                                    {{-- SKENARIO 1: USER SUDAH LOGIN -> TAMPILKAN TOMBOL PINJAM --}}
                                     <form action="{{ route('borrow.store', $book->id) }}" method="POST">
                                         @csrf
                                         <button type="submit" class="btn btn-primary btn-lg w-100"
@@ -137,13 +132,11 @@
                                         </button>
                                     </form>
                                 @else
-                                    {{-- SKENARIO 2: USER BELUM LOGIN -> TAMPILKAN TOMBOL LOGIN --}}
                                     <a href="{{ route('login') }}" class="btn btn-outline-primary btn-lg">
                                         <i class="fa fa-sign-in-alt me-2"></i> Login untuk Pinjam
                                     </a>
                                 @endauth
                             @else
-                                {{-- SKENARIO 3: STOK HABIS --}}
                                 <button class="btn btn-secondary btn-lg" disabled>
                                     <i class="fa fa-ban me-2"></i> Stok Habis
                                 </button>

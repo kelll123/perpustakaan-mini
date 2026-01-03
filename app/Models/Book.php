@@ -9,17 +9,17 @@ class Book extends Model
 {
     use HasFactory;
 
-    protected $table = 'books'; // Koneksi ke tabel books
+    protected $table = 'books'; 
 
     protected $fillable = [
-        'title',        // Ganti 'judul' jadi 'title'
-        'id_author',    // Ganti 'penulis' jadi relasi 'id_author'
-        'id_category',  // Ganti 'kategori_id' jadi 'id_category'
-        'stock',        // (Pastikan kolom ini ada di database)
-        'deskripsi',  // atau 'deskripsi' sesuai tabel
+        'title',       
+        'id_author',   
+        'id_category',  
+        'stock',       
+        'deskripsi',  
         'cover',
-        'tahun_terbit', // sesuai tabel
-        'status'        // (Pastikan kolom ini ada di database)
+        'tahun_terbit', 
+        'status'        
     ];
 
     // Relasi ke Category
