@@ -8,45 +8,31 @@ use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
 {
-    public function index()
-    {
-        $user = Auth::user();
+   public function index()
+{
+    $user = Auth::user();
 
-        // 1. Arahkan Admin ke Dashboard Admin
-        if ($user->role === 'admin') {
-            return redirect()->route('admin.dashboard');
-        }
+    // 1. Redirect berdasarkan Role
+    if ($user->role === 'admin') return redirect()->route('admin.dashboard');
+    if ($user->role === 'staff') return redirect()->route('staff.dashboard');
 
-        // 2. Arahkan Staff ke Dashboard Staff
-        if ($user->role === 'staff') {
-            return redirect()->route('staff.dashboard');
-        }
+    // 2. Ambil Data untuk Member (dengan try-catch)
+    try {
+        $activeBorrows = Borrowing::with('book')
+            ->where('user_id', $user->id) // Menggunakan $user->id dari objek yang sudah ada
+            ->where('status', 'dipinjam')
+            ->get();
 
-        // 3. Logika untuk Member
-        $userId = Auth::id();
-
-        /* CATATAN PENTING: 
-           Jika baris di bawah ini error, itu karena tabel 'borrowings' 
-           belum Anda buat di database perpustakaan_mini.sql
-        */
-        try {
-            $activeBorrows = Borrowing::with('book')
-                ->where('user_id', $userId)
-                ->where('status', 'dipinjam')
-                ->get();
-
-            $historyBorrows = Borrowing::with('book')
-                ->where('user_id', $userId)
-                ->where('status', 'dikembalikan')
-                ->latest()
-                ->get();
-        } catch (\Exception $e) {
-            // Jika tabel belum ada, buat koleksi kosong agar tidak crash
-            $activeBorrows = collect();
-            $historyBorrows = collect();
-        }
-
-        // Gunakan 'members.dashboard' sesuai nama folder di VS Code Anda
-        return view('members.dashboard', compact('activeBorrows', 'historyBorrows'));
+        $historyBorrows = Borrowing::with('book')
+            ->where('user_id', $user->id)
+            ->where('status', 'dikembalikan')
+            ->latest()
+            ->get();
+    } catch (\Exception $e) {
+        $activeBorrows = collect();
+        $historyBorrows = collect();
     }
+
+    return view('members.dashboard', compact('activeBorrows', 'historyBorrows'));
+}
 }
