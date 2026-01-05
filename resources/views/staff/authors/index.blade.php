@@ -40,41 +40,56 @@
                                     </span>
                                 </td>
                                 <td class="text-end pe-3">
-                                    <button class="btn btn-sm btn-warning rounded-circle me-1 text-white"
+                                    {{-- Tombol Edit --}}
+                                    <button class="btn btn-sm btn-warning rounded-circle me-1 text-white shadow-sm"
                                         data-bs-toggle="modal" data-bs-target="#modalEditAuthor{{ $author->id }}">
                                         <i class="fas fa-edit"></i>
                                     </button>
+
+                                    {{-- Tombol Hapus --}}
                                     <form action="{{ route('staff.authors.destroy', $author->id) }}" method="POST"
                                         class="d-inline" onsubmit="return confirm('Hapus penulis ini?')">
                                         @csrf @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger rounded-circle">
+                                        <button type="submit" class="btn btn-sm btn-danger rounded-circle shadow-sm">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </form>
+
+                                    {{-- PERBAIKAN: Modal diletakkan di dalam TD agar struktur tabel aman --}}
+                                    <div class="modal fade text-start" id="modalEditAuthor{{ $author->id }}"
+                                        tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+                                                <form action="{{ route('staff.authors.update', $author->id) }}"
+                                                    method="POST">
+                                                    @csrf @method('PUT')
+                                                    <div class="modal-header border-0">
+                                                        <h5 class="fw-bold m-0 text-dark">Edit Data Penulis</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                            aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="mb-3">
+                                                            <label class="small fw-bold text-muted mb-2 d-block">Nama
+                                                                Lengkap Penulis</label>
+                                                            <input type="text" name="nama_author"
+                                                                class="form-control rounded-3"
+                                                                value="{{ $author->nama_author }}" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer border-0">
+                                                        <button type="button" class="btn btn-light rounded-pill px-4"
+                                                            data-bs-dismiss="modal">Batal</button>
+                                                        <button type="submit"
+                                                            class="btn btn-primary rounded-pill px-4">Simpan
+                                                            Perubahan</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
-
-                            <div class="modal fade" id="modalEditAuthor{{ $author->id }}" tabindex="-1">
-                                <div class="modal-dialog modal-dialog-centered">
-                                    <form action="{{ route('staff.authors.update', $author->id) }}" method="POST"
-                                        class="modal-content border-0 shadow" style="border-radius: 20px;">
-                                        @csrf @method('PUT')
-                                        <div class="modal-header border-0">
-                                            <h5 class="fw-bold">Edit Data Penulis</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                        </div>
-                                        <div class="modal-body text-start">
-                                            <label class="small fw-bold text-muted mb-2">Nama Lengkap Penulis</label>
-                                            <input type="text" name="nama_author" class="form-control rounded-3"
-                                                value="{{ $author->nama_author }}" required>
-                                        </div>
-                                        <div class="modal-footer border-0">
-                                            <button type="submit" class="btn btn-primary rounded-pill px-4">Simpan
-                                                Perubahan</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
                         @endforeach
                     </tbody>
                 </table>
@@ -82,24 +97,30 @@
         </div>
     </div>
 
-    <div class="modal fade" id="modalTambahAuthor" tabindex="-1">
+    {{-- Modal Tambah --}}
+    <div class="modal fade" id="modalTambahAuthor" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <form action="{{ route('staff.authors.store') }}" method="POST" class="modal-content border-0 shadow"
-                style="border-radius: 20px;">
-                @csrf
-                <div class="modal-header border-0">
-                    <h5 class="fw-bold">Tambah Penulis Baru</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <label class="small fw-bold text-muted mb-2">Nama Lengkap Penulis</label>
-                    <input type="text" name="nama_author" class="form-control rounded-3"
-                        placeholder="Masukkan nama penulis..." required>
-                </div>
-                <div class="modal-footer border-0">
-                    <button type="submit" class="btn btn-primary rounded-pill px-4">Tambah Data</button>
-                </div>
-            </form>
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+                <form action="{{ route('staff.authors.store') }}" method="POST">
+                    @csrf
+                    <div class="modal-header border-0">
+                        <h5 class="fw-bold m-0 text-dark">Tambah Penulis Baru</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="small fw-bold text-muted mb-2 d-block">Nama Lengkap Penulis</label>
+                            <input type="text" name="nama_author" class="form-control rounded-3"
+                                placeholder="Masukkan nama penulis..." required>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn btn-light rounded-pill px-4"
+                            data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary rounded-pill px-4">Tambah Data</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 @endsection
