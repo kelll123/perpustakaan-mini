@@ -11,9 +11,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('books', function (Blueprint $table) {
-            $table->integer('tahun_terbit')->after('stock')->nullable();
-        });
+        // Tambahkan pengecekan if di sini untuk menghindari error Duplicate Column
+        if (!Schema::hasColumn('books', 'tahun_terbit')) {
+            Schema::table('books', function (Blueprint $table) {
+                $table->integer('tahun_terbit')->after('stock')->nullable();
+            });
+        }
     }
 
     /**
@@ -21,8 +24,10 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('books', function (Blueprint $table) {
-            $table->dropColumn('tahun_terbit');
-        });
+        if (Schema::hasColumn('books', 'tahun_terbit')) {
+            Schema::table('books', function (Blueprint $table) {
+                $table->dropColumn('tahun_terbit');
+            });
+        }
     }
 };
